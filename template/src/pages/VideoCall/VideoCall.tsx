@@ -39,13 +39,13 @@ import {NetworkQualityProvider} from '../.././components/NetworkQualityContext';
 import { ErrorContext } from '../.././components/common/index';
 import { PreCallProvider, useFpe, VideoCallProvider, ChatUIDataProvider } from 'fpe-api';
 import Precall from '../../components/precall/PreCall';
-
+import VideoArrayRenderer from '../../components/POC_VideoArrayRenderer';
 
 const useChatNotification = (
   messageStore: string | any[],
   privateMessageStore: string | any[],
   chatDisplayed: boolean,
-  isPrivateChatDisplayed: boolean
+  isPrivateChatDisplayed: boolean,
 ) => {
   // store the last checked state from the messagestore, to identify unread messages
   const [lastCheckedPublicState, setLastCheckedPublicState] = useState(0);
@@ -54,7 +54,7 @@ const useChatNotification = (
     if (chatDisplayed && !isPrivateChatDisplayed) {
       setLastCheckedPublicState(messageStore.length);
     }
-  }, [messageStore,isPrivateChatDisplayed]);
+  }, [messageStore, isPrivateChatDisplayed]);
 
   const setPrivateMessageLastSeen = ({userId, lastSeenCount}) => {
     setLastCheckedPrivateState((prevState) => {
@@ -402,16 +402,23 @@ const VideoCall: React.FC = () => {
                                   {backgroundColor: '#ffffff00'},
                                 ]}>
                                 <NetworkQualityProvider>
-                                {layout === Layout.Pinned ? (
-                                  <PinnedVideo />
-                                ) : (
-                                  <GridVideo setLayout={setLayout} />
-                                )}
-                                {sidePanel === SidePanelType.Participants ? (
-                                  cmpTypeGuard(participantsPanel, ParticipantsView)
-                                ) : (
-                                  <></>
-                                )}
+                                  <VideoArrayRenderer activeLayout={layout}>
+                                    {(minVideoArray, maxVideoArray) => {
+                                      return layout === Layout.Pinned ? (
+                                        <PinnedVideo minVideoArray={minVideoArray} maxVideoArray={maxVideoArray}  />
+                                      ) : (
+                                        <GridVideo minVideoArray={minVideoArray} maxVideoArray={maxVideoArray} setLayout={setLayout} />
+                                      );
+                                    }}
+                                  </VideoArrayRenderer>
+                                  {sidePanel === SidePanelType.Participants ? (
+                                    cmpTypeGuard(
+                                      participantsPanel,
+                                      ParticipantsView,
+                                    )
+                                  ) : (
+                                    <></>
+                                  )}
                                 </NetworkQualityProvider>
                                 {sidePanel === SidePanelType.Chat ? (
                                   $config.CHAT ? (
