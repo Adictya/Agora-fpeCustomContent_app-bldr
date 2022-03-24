@@ -38,6 +38,7 @@ const initialLocalState: UidStateInterface = {
       audio: ToggleState.enabled,
       video: ToggleState.enabled,
       streamType: 'high',
+      type: 'rtc'
     },
   ],
 };

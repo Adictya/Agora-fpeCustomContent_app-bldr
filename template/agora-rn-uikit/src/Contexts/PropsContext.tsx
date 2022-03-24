@@ -22,6 +22,7 @@ export interface UidInterface {
   audio: ToggleState;
   video: ToggleState;
   streamType: 'high' | 'low';
+  type: string,
 }
 
 interface remoteBtnStylesInterface {
