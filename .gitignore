@@ -62,9 +62,6 @@ template/*.jsbundle
 # CocoaPods
 template/ios/Pods/
 
-# UI Kit
-template/agora-rn-uikit/
-
 # Built website
 template/dist/
 
@@ -103,6 +100,3 @@ template/theme-dark.json
 
 # logflies
 *.log
-
-#FPE plugin folder: TODO:hari rename folder later
-template/test-fpe/*
