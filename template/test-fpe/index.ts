@@ -18,11 +18,17 @@ const config = installFPE({
       const {setUidArray} = useRtcContext();
       useEffect(() => {
         setUidArray((uidState) => {
-          console.log('min', uidState.min);
-          return {
-            ...uidState,
-            min: [...uidState.min, {type: 'whiteboard', name: 'hii2'}],
-          };
+          if (
+            uidState.min.filter((e) => e.type === 'whiteboard').length > 0 ||
+            uidState.max[0].type === 'whiteboard'
+          ) {
+            return uidState;
+          } else {
+            return {
+              ...uidState,
+              min: [...uidState.min, {type: 'whiteboard', name: 'hii2'}],
+            };
+          }
         });
       }, []);
     },
