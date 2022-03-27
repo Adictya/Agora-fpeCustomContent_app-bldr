@@ -1,63 +1,43 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext} from 'react';
 import {MinUidContext, MaxUidContext} from '../../agora-rn-uikit';
 import RenderComponent from './POC_RenderComponent';
-import Layout from '../subComponents/LayoutEnum';
-import {useFpe} from 'fpe-api';
+// import Layout from '../subComponents/LayoutEnum';
+import {useFpe, VideoCallInterface} from 'fpe-api';
 
 const VideoArrayRenderer = ({
-  activeLayout,
+  // activeLayout,
   children,
 }: {
-  activeLayout: Layout;
+  //activeLayout: Layout;
   children: any;
 }) => {
   const max = useContext(MaxUidContext);
   const min = useContext(MinUidContext);
-  const FpeRenderComponent = useFpe(
-    (config) => config.components?.videoCall?.renderComponentObject,
-  );
+  const FpeRenderComponent = useFpe((config) => {
+    const videocall = config.components?.videoCall as VideoCallInterface;
+    return videocall.renderComponentObject;
+  });
 
-  const minArray = min.map((user, index) =>
-    FpeRenderComponent
-      ? React.createElement(FpeRenderComponent[user.type], {
-          user,
-          index,
-          isMax: false,
-        })
-      : React.createElement(RenderComponent[user.type], {
-          user,
-          index,
-          isMax: false,
-        }),
-  );
+  const minArray = min.map((user, index) => {
+    const Comp = FpeRenderComponent
+      ? FpeRenderComponent[user.type]
+      : RenderComponent[user.type];
+    return <Comp user={user} isMax={false} index={index} />;
+  });
 
-  const maxArray = max.map((user, index) =>
-    FpeRenderComponent
-      ? React.createElement(FpeRenderComponent[user.type], {
-          user,
-          index,
-          isMax: true,
-        })
-      : React.createElement(RenderComponent[user.type], {
-          user,
-          index,
-          isMax: true,
-        }),
-  );
+  const maxArray = max.map((user, index) => {
+    const Comp = FpeRenderComponent
+      ? FpeRenderComponent[user.type]
+      : RenderComponent[user.type];
+    return <Comp user={user} isMax={false} index={index} />;
+  });
 
-  const videoArray = [...max, ...min].map((user, index) =>
-    FpeRenderComponent
-      ? React.createElement(FpeRenderComponent[user.type], {
-          user,
-          index,
-          isMax: index == 0,
-        })
-      : React.createElement(RenderComponent[user.type], {
-          user,
-          index,
-          isMax: index == 0,
-        }),
-  );
+  const videoArray = [...max, ...min].map((user, index) => {
+    const Comp = FpeRenderComponent
+      ? FpeRenderComponent[user.type]
+      : RenderComponent[user.type];
+    return <Comp user={user} isMax={index === 0} index={index} />;
+  });
 
   return <>{children(minArray, maxArray, videoArray)}</>;
 };

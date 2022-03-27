@@ -18,7 +18,7 @@ export const toggleHelper = (state: ToggleState) =>
   state === ToggleState.enabled ? ToggleState.disabled : ToggleState.enabled;
 
 export type UserUidInterface = {
-  type: 'whiteboard'
+  type: string
 }
 
 interface DefaultUidInterface {

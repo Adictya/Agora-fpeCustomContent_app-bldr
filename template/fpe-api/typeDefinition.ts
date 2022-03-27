@@ -44,7 +44,7 @@ export interface renderComponentInterface {
 }
 
 export interface renderComponentObjectInterface {
-  rtc: React.FC<renderComponentInterface>;
+  [key: string]: React.FC<renderComponentInterface>;
 }
 
 export interface VideoCallInterface {
@@ -91,5 +91,5 @@ export interface FpeApiInterface {
    * message callback used to listen for incoming message from private or public
    */
   //message_callback?: //TODO:hari;
-  poc: any
+  poc: any;
 }

@@ -3,32 +3,11 @@ import {installFPE} from 'fpe-api/install';
 import {MaxVideoRenderer} from '../src/components/POC_VideoRenderer';
 import WhiteboardRenderer from './components/WhiteboardRenderer';
 import {useRtcContext, renderComponentInterface} from 'fpe-api';
-import {
-  UidStateInterface,
-  UserUidInterface,
-  UidInterface,
-  ToggleState,
-} from 'agora-rn-uikit/src';
 
 interface whiteboardInterface {
   type: 'whiteboard';
   name: string;
 }
-declare module 'agora-rn-uikit' {
-  // interface UidInterface {
-  //   type: string,
-  //   name: string,
-  // }
-  // interface UidInterfaceA {}
-  // interface UidInterfaceB {
-  //   type: 'whiteboard';
-  //   name: string;
-  // }
-  // export type UidInterface = {
-  export type UserUidInterface = whiteboardInterface;
-  // export type UidInterface = UidInterfaceA | UidInterfaceB;
-}
-
 declare module 'fpe-api' {
   interface renderComponentObjectInterface {
     whiteboard: React.FC<renderComponentInterface>;
@@ -50,14 +29,14 @@ const config = installFPE({
       useEffect(() => {
         setUidArray((uidState) => {
           if (
-            uidState.min.filter((e) => e.type === 'whiteboard' && e.name).length > 0 ||
+            uidState.min.filter((e) => e.type === 'whiteboard').length > 0 ||
             uidState.max[0].type === 'whiteboard'
           ) {
             return uidState;
           } else {
-            const whiteboardItem: UidInterface = {
+            const whiteboardItem: whiteboardInterface = {
               type: 'whiteboard',
-              name: 'test'
+              name: 'test',
             };
             return {
               ...uidState,
