@@ -14,6 +14,8 @@ export const POC_CustomUserContextHolder: React.FC = (props) => {
       );
     } else if (Component.provider) {
       return <Component.provider>{props.children}</Component.provider>;
+    } else {
+      return props.children;
     }
   } else {
     return props.children;
