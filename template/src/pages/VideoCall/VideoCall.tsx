@@ -40,6 +40,7 @@ import { ErrorContext } from '../.././components/common/index';
 import { PreCallProvider, useFpe, VideoCallProvider, ChatUIDataProvider } from 'fpe-api';
 import Precall from '../../components/precall/PreCall';
 import VideoArrayRenderer from '../../components/POC_VideoArrayRenderer';
+import { POC_CustomUserContextHolder } from '../../components/POC_CustomUserContextholder';
 
 const useChatNotification = (
   messageStore: string | any[],
@@ -401,39 +402,41 @@ const VideoCall: React.FC = () => {
                                   style.videoView,
                                   {backgroundColor: '#ffffff00'},
                                 ]}>
-                                <NetworkQualityProvider>
-                                  <VideoArrayRenderer activeLayout={layout}>
-                                    {(minVideoArray, maxVideoArray) => {
-                                      return layout === Layout.Pinned ? (
-                                        <PinnedVideo minVideoArray={minVideoArray} maxVideoArray={maxVideoArray}  />
-                                      ) : (
-                                        <GridVideo minVideoArray={minVideoArray} maxVideoArray={maxVideoArray} setLayout={setLayout} />
-                                      );
-                                    }}
-                                  </VideoArrayRenderer>
-                                  {sidePanel === SidePanelType.Participants ? (
-                                    cmpTypeGuard(
-                                      participantsPanel,
-                                      ParticipantsView,
+                                <POC_CustomUserContextHolder>
+                                  <NetworkQualityProvider>
+                                    <VideoArrayRenderer activeLayout={layout}>
+                                      {(minVideoArray, maxVideoArray) => {
+                                        return layout === Layout.Pinned ? (
+                                          <PinnedVideo minVideoArray={minVideoArray} maxVideoArray={maxVideoArray}  />
+                                        ) : (
+                                          <GridVideo minVideoArray={minVideoArray} maxVideoArray={maxVideoArray} setLayout={setLayout} />
+                                        );
+                                      }}
+                                    </VideoArrayRenderer>
+                                    {sidePanel === SidePanelType.Participants ? (
+                                      cmpTypeGuard(
+                                        participantsPanel,
+                                        ParticipantsView,
+                                      )
+                                    ) : (
+                                      <></>
+                                    )}
+                                  </NetworkQualityProvider>
+                                  {sidePanel === SidePanelType.Chat ? (
+                                    $config.CHAT ? (
+                                     cmpTypeGuard(chat,Chat)
+                                    ) : (
+                                      <></>
                                     )
                                   ) : (
                                     <></>
                                   )}
-                                </NetworkQualityProvider>
-                                {sidePanel === SidePanelType.Chat ? (
-                                  $config.CHAT ? (
-                                   cmpTypeGuard(chat,Chat)
+                                  {sidePanel === SidePanelType.Settings ? (
+                                    cmpTypeGuard(settingsPanel, SettingsView)
                                   ) : (
                                     <></>
-                                  )
-                                ) : (
-                                  <></>
-                                )}
-                                {sidePanel === SidePanelType.Settings ? (
-                                  cmpTypeGuard(settingsPanel, SettingsView)
-                                ) : (
-                                  <></>
-                                )}
+                                  )}
+                                </POC_CustomUserContextHolder>
                               </View>
                             {Platform.OS !== 'web' &&
                             sidePanel === SidePanelType.Chat ? (

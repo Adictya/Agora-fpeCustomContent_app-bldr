@@ -4,6 +4,7 @@ import {
   UidStateInterface,
   DispatchType,
   ActionType,
+  ActionInterface,
 } from './Contexts/RtcContext';
 import PropsContext, {
   ToggleState,
@@ -38,7 +39,7 @@ const initialLocalState: UidStateInterface = {
       audio: ToggleState.enabled,
       video: ToggleState.enabled,
       streamType: 'high',
-      type: 'rtc'
+      type: 'rtc',
     },
   ],
 };
@@ -114,6 +115,11 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
           stateUpdate = RemoteVideoStateChanged(state, action);
         }
         break;
+      case 'SetState':
+        if (actionTypeGuard(action, action.type)) {
+          stateUpdate = action.value;
+        }
+        break;
     }
 
     // TODO: remove Handle event listeners
@@ -169,6 +175,14 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
     initialState,
   );
 
+  const setUidArray = (param: any) => {
+    if (typeof param === 'function') {
+      dispatch({type: 'SetState', value: param(uidState)});
+    } else {
+      dispatch({type: 'SetState', value: param});
+    }
+  };
+
   return (
     <Create dispatch={dispatch}>
       {(engineRef) => (
@@ -182,6 +196,7 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
               RtcEngine: engineRef.current,
               dispatch,
               setDualStreamMode,
+              setUidArray,
             }}>
             <MaxUidProvider value={uidState.max}>
               <MinUidProvider value={uidState.min}>
