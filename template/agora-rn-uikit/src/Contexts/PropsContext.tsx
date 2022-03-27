@@ -3,6 +3,7 @@ import {StyleProp, ViewStyle} from 'react-native';
 import {RtcEngineEvents} from 'react-native-agora/lib/typescript/src/common/RtcEvents';
 import {EncryptionMode} from 'react-native-agora';
 import {VideoProfile} from '../Utils/quality';
+import {UidStateInterface} from './RtcContext';
 
 // disabled is intentionally kept as the 1st item in the enum.
 // This way, it evaluates to a falsy value in a if statement
@@ -16,14 +17,21 @@ export enum ToggleState {
 export const toggleHelper = (state: ToggleState) =>
   state === ToggleState.enabled ? ToggleState.disabled : ToggleState.enabled;
 
-export interface UidInterface {
+export type UserUidInterface = {
+  type: 'whiteboard'
+}
+
+interface DefaultUidInterface {
   // TODO: refactor local to 0 and remove string.
   uid: number | string;
   audio: ToggleState;
   video: ToggleState;
   streamType: 'high' | 'low';
-  type: string,
+  type: 'rtc';
 }
+
+export type UidInterface = DefaultUidInterface | UserUidInterface;
+// export interface UidInterface  | UserUidInterface
 
 interface remoteBtnStylesInterface {
   muteRemoteAudio?: StyleProp<ViewStyle>;
@@ -90,6 +98,9 @@ export interface CallbacksInterface {
   RemoteAudioStateChanged: RtcEngineEvents['RemoteAudioStateChanged'];
   RemoteVideoStateChanged: RtcEngineEvents['RemoteVideoStateChanged'];
   JoinChannelSuccess: RtcEngineEvents['JoinChannelSuccess'];
+  SetState(
+    param: UidStateInterface | ((p: UidStateInterface) => UidStateInterface),
+  ): void;
 }
 
 export type CustomCallbacksInterface = CallbacksInterface;

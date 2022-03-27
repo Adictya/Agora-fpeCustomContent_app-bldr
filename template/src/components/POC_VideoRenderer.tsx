@@ -1,9 +1,5 @@
 import React, {useContext} from 'react';
-import {
-  View,
-  StyleSheet,
-  Pressable,
-} from 'react-native';
+import {View, StyleSheet, Pressable} from 'react-native';
 import {RtcContext} from '../../agora-rn-uikit';
 import ScreenShareNotice from '../subComponents/ScreenShareNotice';
 import {MaxVideoView} from '../../agora-rn-uikit';
@@ -16,10 +12,7 @@ import TextWithTooltip from '../subComponents/TextWithTooltip';
 import networkQualityContext from './NetworkQualityContext';
 import {NetworkQualityPill} from '../subComponents/NetworkQualityPill';
 
-const MaxVideoRenderer = ({
-  user,
-  isMax
-}: {
+interface MaxVideoRendererInterface {
   user: any;
   // ----------
   // incase of single component for min and max
@@ -27,6 +20,10 @@ const MaxVideoRenderer = ({
   isMax?: Boolean;
   // ----------
   index: number;
+}
+const MaxVideoRenderer: React.FC<MaxVideoRendererInterface> = ({
+  user,
+  isMax,
 }) => {
   const {dispatch} = useContext(RtcContext);
   const {userList, localUid} = useContext(chatContext);
@@ -100,7 +97,7 @@ const MaxVideoRenderer = ({
 };
 
 const maxStyle = StyleSheet.create({
-  container: {width:'100%',height:'100%'},
+  container: {width: '100%', height: '100%'},
   width80: {width: '80%'},
   width100: {width: '100%'},
   flex2: {flex: 2},

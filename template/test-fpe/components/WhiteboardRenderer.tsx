@@ -2,9 +2,7 @@ import React, {useContext} from 'react';
 import {View, Text} from 'react-native';
 import ColorContext from '../../src/components/ColorContext';
 
-const WhiteboardRenderer = ({
-  user,
-}: {
+interface MaxVideoRendererInterface {
   user: any;
   // ----------
   // incase of single component for min and max
@@ -12,7 +10,8 @@ const WhiteboardRenderer = ({
   isMax?: Boolean;
   // ----------
   index: number;
-}) => {
+}
+const WhiteboardRenderer: React.FC<MaxVideoRendererInterface> = ({user}) => {
   const {primaryColor} = useContext(ColorContext);
   return (
     <View

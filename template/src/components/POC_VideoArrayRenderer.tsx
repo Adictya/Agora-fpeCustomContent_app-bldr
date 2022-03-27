@@ -14,7 +14,7 @@ const VideoArrayRenderer = ({
   const max = useContext(MaxUidContext);
   const min = useContext(MinUidContext);
   const FpeRenderComponent = useFpe(
-    (config) => config.components?.videoCall?.renderComponent,
+    (config) => config.components?.videoCall?.renderComponentObject,
   );
 
   const minArray = min.map((user, index) =>

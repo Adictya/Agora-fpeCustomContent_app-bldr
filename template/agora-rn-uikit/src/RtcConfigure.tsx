@@ -117,7 +117,7 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
         break;
       case 'SetState':
         if (actionTypeGuard(action, action.type)) {
-          stateUpdate = action.value;
+          stateUpdate = action.value[0];
         }
         break;
     }
@@ -175,11 +175,13 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
     initialState,
   );
 
-  const setUidArray = (param: any) => {
+  const setUidArray = (
+    param: UidStateInterface | ((p: UidStateInterface) => UidStateInterface),
+  ) => {
     if (typeof param === 'function') {
-      dispatch({type: 'SetState', value: param(uidState)});
+      dispatch({type: 'SetState', value: [param(uidState)]});
     } else {
-      dispatch({type: 'SetState', value: param});
+      dispatch({type: 'SetState', value: [param]});
     }
   };
 
