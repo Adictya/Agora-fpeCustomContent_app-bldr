@@ -32,7 +32,8 @@ import ChatContext from '../components/ChatContext';
 import isMobileOrTablet from '../utils/mobileWebTest';
 import {BtnTemplate} from '../../agora-rn-uikit';
 import {ImageIcon} from '../../agora-rn-uikit';
-import { useVideoCall, useChatUIData } from 'fpe-api';
+import {useVideoCall, useChatUIData} from 'fpe-api';
+import {useFpe, VideoCallInterface} from 'fpe-api';
 
 const Navbar = () => {
   const {messageStore} = useContext(ChatContext);
@@ -42,6 +43,7 @@ const Navbar = () => {
     setSidePanel,
     layout,
     setLayout,
+    layouts,
     isHost,
     title,
   } = useVideoCall(data => data);
@@ -63,9 +65,7 @@ const Navbar = () => {
         {backgroundColor: $config.SECONDARY_FONT_COLOR + 80},
         Platform.OS === 'web'
           ? {
-              justifyContent: isMobileOrTablet()
-                ? 'space-between'
-                : 'flex-end',
+              justifyContent: isMobileOrTablet() ? 'space-between' : 'flex-end',
             }
           : {},
       ]}>
@@ -82,7 +82,7 @@ const Navbar = () => {
               height: 20,
               margin: 1,
             }}
-            color='#FD0845'
+            color="#FD0845"
           />
           <Text
             style={{
@@ -133,7 +133,10 @@ const Navbar = () => {
             </View>
           </View>
         ) : (
-          <Text style={style.roomNameText}>{title}</Text>
+          <>
+            <Text style={style.roomNameText}>{title}</Text>
+            <Text style={style.roomNameText}>|{layouts[layout].name}</Text>
+          </>
         )}
       </View>
       <View
@@ -249,15 +252,21 @@ const Navbar = () => {
             <></>
           )}
           <View style={{width: '20%', height: '100%'}}>
-              <BtnTemplate
-                style={style.btnHolder}
-                onPress={() => {
-                  setLayout((l: Layout) =>
-                    l === Layout.Pinned ? Layout.Grid : Layout.Pinned,
-                  );
-                }}
-                name={layout ? 'pinnedLayoutIcon' : 'gridLayoutIcon'}
-              />
+            <BtnTemplate
+              style={style.btnHolder}
+              onPress={() => {
+                setLayout((l: Layout) => {
+                  if (l < layouts?.length - 1 ) {
+                    return l + 1;
+                  } else {
+                    return 0;
+                  }
+                });
+              }}
+              name={
+                layouts[layout].icon ? 'pinnedLayoutIcon' : 'gridLayoutIcon'
+              }
+            />
           </View>
           {/** Show setting icon only in non native apps
            * show in web/electron/mobile web

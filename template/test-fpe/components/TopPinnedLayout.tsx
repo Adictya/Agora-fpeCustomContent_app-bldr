@@ -21,12 +21,12 @@ import {
 import {RtcContext} from '../../agora-rn-uikit';
 import {MinUidContext} from '../../agora-rn-uikit';
 import {MaxUidContext} from '../../agora-rn-uikit';
-import {layoutProps} from '../../theme.json';
-import { layoutComponent } from 'fpe-api';
-const {topPinned} = layoutProps;
+import {layoutComponent} from 'fpe-api';
+const topPinned = true;
 
-const PinnedVideo:layoutComponent = ({maxVideoArray, minVideoArray}) => {
+const TopPinnedVideo: layoutComponent = ({maxVideoArray, minVideoArray}) => {
   const [collapse, setCollapse] = useState(false);
+  // Custom Hook *********************
   const [dim, setDim] = useState([
     Dimensions.get('window').width,
     Dimensions.get('window').height,
@@ -39,6 +39,7 @@ const PinnedVideo:layoutComponent = ({maxVideoArray, minVideoArray}) => {
       setDim([width, height, isLandscape]);
     }, 20);
   };
+  // **********************************
   const isSidePinnedlayout = topPinned === true ? false : dim[2]; // if either explicity set to false or auto evaluation
   const max = useContext(MaxUidContext);
   const min = useContext(MinUidContext);
@@ -115,7 +116,7 @@ const PinnedVideo:layoutComponent = ({maxVideoArray, minVideoArray}) => {
                       paddingVertical: 4,
                     }
               }
-              key={"minVideo"+i}
+              key={'minVideo' + i}
               onPress={() => {
                 dispatch({type: 'SwapVideo', value: [min[i]]});
               }}>
@@ -133,9 +134,7 @@ const PinnedVideo:layoutComponent = ({maxVideoArray, minVideoArray}) => {
             : style.flex4
         }>
         {maxVideoArray.map((Video, i) => (
-          <View style={style.flex1}>
-            {Video}
-          </View>
+          <View style={style.flex1}>{Video}</View>
         ))}
       </View>
     </View>
@@ -148,40 +147,6 @@ const style = StyleSheet.create({
   flex2: {flex: 2},
   flex4: {flex: 4, backgroundColor: '#ffffff00'},
   flex1: {flex: 1},
-  nameHolder: {
-    marginTop: -25,
-    backgroundColor: $config.SECONDARY_FONT_COLOR + 'aa',
-    alignSelf: 'flex-end',
-    paddingHorizontal: 8,
-    height: 25,
-    borderTopLeftRadius: 15,
-    borderBottomRightRadius: 15,
-    flexDirection: 'row',
-    zIndex: 5,
-    maxWidth: '100%',
-  },
-  name: {
-    color: $config.PRIMARY_FONT_COLOR,
-    lineHeight: 25,
-    fontWeight: '700',
-    flexShrink: 1,
-  },
-  MicBackdrop: {
-    width: 20,
-    height: 20,
-    borderRadius: 15,
-    marginHorizontal: 10,
-    backgroundColor: $config.SECONDARY_FONT_COLOR,
-    display: 'flex',
-    alignSelf: 'center',
-    justifyContent: 'center',
-  },
-  MicIcon: {
-    width: '80%',
-    height: '80%',
-    alignSelf: 'center',
-    resizeMode: 'contain',
-  },
 });
 
-export default PinnedVideo;
+export default TopPinnedVideo;

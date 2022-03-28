@@ -14,6 +14,7 @@ import {
   channelMessage,
   chatInputInterface,
 } from '../src/components/ChatContext';
+import {layoutObjectInterface} from '../src/pages/VideoCall';
 
 //todo:hari define AnyReactComponent support any react component
 export type AnyReactComponent = React.FC<any>;
@@ -54,6 +55,7 @@ export interface VideoCallInterface {
   bottomBar?: AnyReactComponent;
   chat?: ChatCmpInterface | AnyReactComponent;
   renderComponentObject?: renderComponentObjectInterface;
+  customLayout?: (p: layoutObjectInterface[]) => layoutObjectInterface[];
 }
 
 export type ComponentsInterface = {

@@ -3,6 +3,7 @@ import {installFPE} from 'fpe-api/install';
 import {MaxVideoRenderer} from '../src/components/POC_VideoRenderer';
 import WhiteboardRenderer from './components/WhiteboardRenderer';
 import {useRtcContext, renderComponentInterface} from 'fpe-api';
+import TopPinnedVideo from './components/TopPinnedLayout';
 
 interface whiteboardInterface {
   type: 'whiteboard';
@@ -20,6 +21,15 @@ const config = installFPE({
       renderComponentObject: {
         rtc: MaxVideoRenderer,
         whiteboard: WhiteboardRenderer,
+      },
+      customLayout: (layouts) => {
+        return [
+          ...layouts,
+          {
+            name: 'topPinned',
+            component: TopPinnedVideo,
+          },
+        ];
       },
     },
   },
