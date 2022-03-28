@@ -19,7 +19,7 @@ import {
   Image,
   ScrollView,
   Dimensions,
-  useWindowDimensions
+  useWindowDimensions,
 } from 'react-native';
 import {RFValue} from 'react-native-responsive-fontsize';
 import {MinUidConsumer} from '../../agora-rn-uikit';
@@ -39,11 +39,11 @@ import platform from '../subComponents/Platform';
 import {SidePanelType} from '../subComponents/SidePanelEnum';
 import {UserType} from './RTMConfigure';
 import styles from './styles';
-import TextWithToolTip from '../subComponents/TextWithTooltip'
+import TextWithToolTip from '../subComponents/TextWithTooltip';
 import {useVideoCall} from 'fpe-api';
 
 const ParticipantView = () => {
-  const {isHost} = useVideoCall(data => data);
+  const {isHost} = useVideoCall((data) => data);
   const {height, width} = useWindowDimensions();
   const {userList, localUid} = useContext(chatContext);
   const {primaryColor} = useContext(ColorContext);
@@ -53,7 +53,7 @@ const ParticipantView = () => {
     Dimensions.get('window').width > Dimensions.get('window').height,
   ]);
   const isSmall = dim[0] < 700;
-  let fontSize = Platform.OS === 'web' ? 14 : 16
+  let fontSize = Platform.OS === 'web' ? 14 : 16;
   return (
     <View
       style={
@@ -77,90 +77,121 @@ const ParticipantView = () => {
           {(minUsers) => (
             <MaxUidConsumer>
               {(maxUser) =>
-                [...minUsers, ...maxUser].map((user) =>
-                  user.uid === 'local' ? (
-                    <View style={style.participantContainer} key={user.uid}>
-                      <View style={{flex:1}}>
-                        <TextWithToolTip 
-                          value={userList[localUid] ? userList[localUid].name + ' ' : 'You '} 
-                          style={[style.participantText, { fontSize: RFValue(fontSize, height > width ? height : width) }]}
-                        />
-                      </View>
-                      <View style={style.participantButtonContainer}>
-                        <LocalUserContext>
-                          <View
-                            style={[style.actionBtnIcon, {marginRight: 10}]}>
-                            <LocalAudioMute btnText=" " variant="text" />
-                          </View>
-                          <View style={style.actionBtnIcon}>
-                            <LocalVideoMute btnText=" " variant="text" />
-                          </View>
-                        </LocalUserContext>
-                      </View>
-                    </View>
-                  ) : user.uid === 1 ? (
-                    <View style={style.participantContainer} key={user.uid}>
-                      <View style={{flex:1}}>
-                        <TextWithToolTip 
-                          value={userList[localUid]
-                            ? userList[localUid].name + "'s screenshare "
-                            : 'Your screenshare '} 
-                          style={[style.participantText, { fontSize: RFValue(fontSize, height > width ? height : width) }]}
-                        />
-                      </View>
-                      <View style={style.dummyView}>
-                          {/** its just the placeholder to adjust the UI. if no icon option to be shown */}
-                          <Text>local screen sharing</Text>
-                      </View>
-                    </View>
-                  ) : (
-                    <View style={style.participantContainer} key={user.uid} >
-                      <View style={{flex:1}}>
-                        <TextWithToolTip 
-                          value={userList[user.uid]
-                            ? userList[user.uid].name + ' '
-                            : String(user.uid)[0] === '1'
-                            ? 'PSTN User '
-                            : 'User '} 
-                          style={[style.participantText, { fontSize: RFValue(fontSize, height > width ? height : width) }]}
-                        />
-                      </View>
-                      {userList[user.uid]?.type !== UserType.ScreenShare ? (
-                        <View style={style.participantButtonContainer}>
-                          <View style={style.actionBtnIcon}>
-                            <RemoteEndCall
-                              uid={user.uid}
-                              isHost={isHost}
-                            />
-                          </View>
-                          <View
+                [...minUsers, ...maxUser].map((user) => {
+                  if (user.type === 'whiteboard')
+                    return user.uid === 'local' ? (
+                      <View style={style.participantContainer} key={user.uid}>
+                        <View style={{flex: 1}}>
+                          <TextWithToolTip
+                            value={
+                              userList[localUid]
+                                ? userList[localUid].name + ' '
+                                : 'You '
+                            }
                             style={[
-                              style.actionBtnIcon,
-                              {marginLeft: 10, marginRight: 5},
-                            ]}>
-                            <RemoteAudioMute
-                              uid={user.uid}
-                              audio={user.audio}
-                              isHost={isHost}
-                            />
-                          </View>
-                          <View style={[style.actionBtnIcon, {marginRight:5}]}>
-                            <RemoteVideoMute
-                              uid={user.uid}
-                              video={user.video}
-                              isHost={isHost}
-                            />
-                          </View>
+                              style.participantText,
+                              {
+                                fontSize: RFValue(
+                                  fontSize,
+                                  height > width ? height : width,
+                                ),
+                              },
+                            ]}
+                          />
                         </View>
-                      ) : (
+                        <View style={style.participantButtonContainer}>
+                          <LocalUserContext>
+                            <View
+                              style={[style.actionBtnIcon, {marginRight: 10}]}>
+                              <LocalAudioMute btnText=" " variant="text" />
+                            </View>
+                            <View style={style.actionBtnIcon}>
+                              <LocalVideoMute btnText=" " variant="text" />
+                            </View>
+                          </LocalUserContext>
+                        </View>
+                      </View>
+                    ) : user.uid === 1 ? (
+                      <View style={style.participantContainer} key={user.uid}>
+                        <View style={{flex: 1}}>
+                          <TextWithToolTip
+                            value={
+                              userList[localUid]
+                                ? userList[localUid].name + "'s screenshare "
+                                : 'Your screenshare '
+                            }
+                            style={[
+                              style.participantText,
+                              {
+                                fontSize: RFValue(
+                                  fontSize,
+                                  height > width ? height : width,
+                                ),
+                              },
+                            ]}
+                          />
+                        </View>
                         <View style={style.dummyView}>
                           {/** its just the placeholder to adjust the UI. if no icon option to be shown */}
-                          <Text>remote screen sharing</Text>
+                          <Text>local screen sharing</Text>
                         </View>
-                      )}
-                    </View>
-                  ),
-                )
+                      </View>
+                    ) : (
+                      <View style={style.participantContainer} key={user.uid}>
+                        <View style={{flex: 1}}>
+                          <TextWithToolTip
+                            value={
+                              userList[user.uid]
+                                ? userList[user.uid].name + ' '
+                                : String(user.uid)[0] === '1'
+                                ? 'PSTN User '
+                                : 'User '
+                            }
+                            style={[
+                              style.participantText,
+                              {
+                                fontSize: RFValue(
+                                  fontSize,
+                                  height > width ? height : width,
+                                ),
+                              },
+                            ]}
+                          />
+                        </View>
+                        {userList[user.uid]?.type !== UserType.ScreenShare ? (
+                          <View style={style.participantButtonContainer}>
+                            <View style={style.actionBtnIcon}>
+                              <RemoteEndCall uid={user.uid} isHost={isHost} />
+                            </View>
+                            <View
+                              style={[
+                                style.actionBtnIcon,
+                                {marginLeft: 10, marginRight: 5},
+                              ]}>
+                              <RemoteAudioMute
+                                uid={user.uid}
+                                audio={user.audio}
+                                isHost={isHost}
+                              />
+                            </View>
+                            <View
+                              style={[style.actionBtnIcon, {marginRight: 5}]}>
+                              <RemoteVideoMute
+                                uid={user.uid}
+                                video={user.video}
+                                isHost={isHost}
+                              />
+                            </View>
+                          </View>
+                        ) : (
+                          <View style={style.dummyView}>
+                            {/** its just the placeholder to adjust the UI. if no icon option to be shown */}
+                            <Text>remote screen sharing</Text>
+                          </View>
+                        )}
+                      </View>
+                    );
+                })
               }
             </MaxUidConsumer>
           )}
@@ -231,14 +262,14 @@ const style = StyleSheet.create({
     color: $config.PRIMARY_FONT_COLOR,
     lineHeight: 20,
     paddingHorizontal: 5,
-    textAlign:'left',
-    flexShrink: 1 
+    textAlign: 'left',
+    flexShrink: 1,
   },
   participantButtonContainer: {
     flex: 0.5,
     flexDirection: 'row',
     paddingRight: 5,
-    justifyContent:'flex-end'
+    justifyContent: 'flex-end',
   },
   secondaryBtn: {
     alignSelf: 'center',
@@ -277,9 +308,11 @@ const style = StyleSheet.create({
     width: 25,
     height: 25,
   },
-  dummyView:{
-    flex: 0.5,opacity:0, marginHorizontal: 5
-  }
+  dummyView: {
+    flex: 0.5,
+    opacity: 0,
+    marginHorizontal: 5,
+  },
 });
 
 export default ParticipantView;

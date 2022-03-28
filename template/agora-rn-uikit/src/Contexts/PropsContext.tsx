@@ -17,8 +17,8 @@ export enum ToggleState {
 export const toggleHelper = (state: ToggleState) =>
   state === ToggleState.enabled ? ToggleState.disabled : ToggleState.enabled;
 
-export type UserUidInterface = {
-  type: string
+export interface UserUidInterface<T> {
+  type: T extends DefaultUidInterface['type'] ? never : T
 }
 
 interface DefaultUidInterface {
@@ -30,8 +30,14 @@ interface DefaultUidInterface {
   type: 'rtc';
 }
 
-export type UidInterface = DefaultUidInterface | UserUidInterface;
-// export interface UidInterface  | UserUidInterface
+// export type UidInterface = DefaultUidInterface;
+export interface UidInterface {
+  uid: number | string;
+  audio: ToggleState;
+  video: ToggleState;
+  streamType: 'high' | 'low';
+  type: 'rtc';
+}
 
 interface remoteBtnStylesInterface {
   muteRemoteAudio?: StyleProp<ViewStyle>;
