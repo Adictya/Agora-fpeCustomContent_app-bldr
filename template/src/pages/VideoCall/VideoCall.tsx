@@ -36,16 +36,34 @@ import {videoView} from '../.././../theme.json';
 import Layout from '../.././subComponents/LayoutEnum';
 import Toast from '../.././../react-native-toast-message';
 import {NetworkQualityProvider} from '../.././components/NetworkQualityContext';
-import { ErrorContext } from '../.././components/common/index';
-import { PreCallProvider, useFpe, VideoCallProvider, ChatUIDataProvider } from 'fpe-api';
+import {ErrorContext} from '../.././components/common/index';
+import {
+  PreCallProvider,
+  useFpe,
+  VideoCallProvider,
+  ChatUIDataProvider,
+  VideoCallInterface,
+} from 'fpe-api';
 import Precall from '../../components/precall/PreCall';
+import VideoArrayRenderer from '../../components/POC_VideoArrayRenderer';
+import {POC_CustomUserContextHolder} from '../../components/POC_CustomUserContextholder';
 
+export type layoutComponent = React.FC<{
+  maxVideoArray: React.FC[];
+  minVideoArray: React.FC[];
+}>;
+
+export interface layoutObjectInterface {
+  name: string;
+  icon?: string;
+  component: layoutComponent;
+}
 
 const useChatNotification = (
   messageStore: string | any[],
   privateMessageStore: string | any[],
   chatDisplayed: boolean,
-  isPrivateChatDisplayed: boolean
+  isPrivateChatDisplayed: boolean,
 ) => {
   // store the last checked state from the messagestore, to identify unread messages
   const [lastCheckedPublicState, setLastCheckedPublicState] = useState(0);
@@ -54,7 +72,7 @@ const useChatNotification = (
     if (chatDisplayed && !isPrivateChatDisplayed) {
       setLastCheckedPublicState(messageStore.length);
     }
-  }, [messageStore,isPrivateChatDisplayed]);
+  }, [messageStore, isPrivateChatDisplayed]);
 
   const setPrivateMessageLastSeen = ({userId, lastSeenCount}) => {
     setLastCheckedPrivateState((prevState) => {
@@ -70,7 +88,12 @@ const useChatNotification = (
   ];
 };
 
-const NotificationControl = ({children, chatDisplayed, setSidePanel, isPrivateChatDisplayed}) => {
+const NotificationControl = ({
+  children,
+  chatDisplayed,
+  setSidePanel,
+  isPrivateChatDisplayed,
+}) => {
   const {messageStore, privateMessageStore, userList, localUid, events} =
     useContext(ChatContext);
   const [
@@ -79,7 +102,12 @@ const NotificationControl = ({children, chatDisplayed, setSidePanel, isPrivateCh
     lastCheckedPrivateState,
     setLastCheckedPrivateState,
     setPrivateMessageLastSeen,
-  ] = useChatNotification(messageStore, privateMessageStore, chatDisplayed, isPrivateChatDisplayed);
+  ] = useChatNotification(
+    messageStore,
+    privateMessageStore,
+    chatDisplayed,
+    isPrivateChatDisplayed,
+  );
 
   const pendingPublicNotification =
     messageStore.length - lastCheckedPublicState;
@@ -235,11 +263,14 @@ enum RnEncryptionEnum {
 }
 
 const VideoCall: React.FC = () => {
-  const {
-    chat,bottomBar,participantsPanel,settingsPanel,topBar
-  } = useFpe(data => typeof data.components?.videoCall === 'object' ? data.components?.videoCall : {})
-  const PreCallScreenFpe = useFpe(data => data.components?.precall)
-  const {setGlobalErrorMessage} = useContext(ErrorContext)
+  const {chat, bottomBar, participantsPanel, settingsPanel, topBar} = useFpe(
+    (data) =>
+      typeof data.components?.videoCall === 'object'
+        ? data.components?.videoCall
+        : {},
+  );
+  const PreCallScreenFpe = useFpe((data) => data.components?.precall);
+  const {setGlobalErrorMessage} = useContext(ErrorContext);
   const {store, setStore} = useContext(StorageContext);
   const getInitialUsername = () =>
     store?.displayName ? store.displayName : '';
@@ -251,7 +282,7 @@ const VideoCall: React.FC = () => {
   const [chatDisplayed, setChatDisplayed] = useState(false);
   const [queryComplete, setQueryComplete] = useState(false);
   const [sidePanel, setSidePanel] = useState<SidePanelType>(SidePanelType.None);
-  const [isPrivateChatDisplayed, setPrivateChatDisplayed] = useState(false)
+  const [isPrivateChatDisplayed, setPrivateChatDisplayed] = useState(false);
   const {phrase} = useParams();
   const [errorMessage, setErrorMessage] = useState(null);
   const [isHost, setIsHost] = React.useState(false);
@@ -280,12 +311,20 @@ const VideoCall: React.FC = () => {
     },
   );
 
+  const fpeLayouts = useFpe((config) => {
+    const videocall = config.components?.videoCall as VideoCallInterface;
+    return videocall.customLayout!([
+      {name: 'Grid', icon: 'gridLayoutIcon', component: GridVideo},
+      {name: 'PinnedVideo', icon: 'pinnedLayoutIcon', component: PinnedVideo},
+    ]);
+  });
+
   React.useEffect(() => {
     if (error) {
       console.log('error', error);
       // console.log('error data', data);
       if (!errorMessage) {
-        setGlobalErrorMessage && setGlobalErrorMessage(error)
+        setGlobalErrorMessage && setGlobalErrorMessage(error);
       }
       return;
     }
@@ -363,8 +402,7 @@ const VideoCall: React.FC = () => {
                       <NotificationControl
                         setSidePanel={setSidePanel}
                         chatDisplayed={sidePanel === SidePanelType.Chat}
-                        isPrivateChatDisplayed={isPrivateChatDisplayed}
-                        >
+                        isPrivateChatDisplayed={isPrivateChatDisplayed}>
                         {({
                           pendingPublicNotification,
                           pendingPrivateNotification,
@@ -383,72 +421,103 @@ const VideoCall: React.FC = () => {
                             recordingActive={recordingActive}
                             setRecordingActive={setRecordingActive}
                             isHost={isHost}
-                            title={title}                      
-                          >
+                            title={title}
+                            layouts={fpeLayouts}
+                            >
                             <ChatUIDataProvider
                               privateMessageCountMap={privateMessageCountMap}
-                              pendingPublicNotification={pendingPublicNotification}
-                              pendingPrivateNotification={pendingPrivateNotification}
+                              pendingPublicNotification={
+                                pendingPublicNotification
+                              }
+                              pendingPrivateNotification={
+                                pendingPrivateNotification
+                              }
                               lastCheckedPrivateState={lastCheckedPrivateState}
-                              pendingMessageLength={pendingPublicNotification + pendingPrivateNotification}
-                              setLastCheckedPublicState={setLastCheckedPublicState}
-                              setPrivateMessageLastSeen={setPrivateMessageLastSeen}
-                              setPrivateChatDisplayed={setPrivateChatDisplayed}
-                            >
-                              {cmpTypeGuard(topBar,Navbar)}
+                              pendingMessageLength={
+                                pendingPublicNotification +
+                                pendingPrivateNotification
+                              }
+                              setLastCheckedPublicState={
+                                setLastCheckedPublicState
+                              }
+                              setPrivateMessageLastSeen={
+                                setPrivateMessageLastSeen
+                              }
+                              setPrivateChatDisplayed={setPrivateChatDisplayed}>
+                              {cmpTypeGuard(topBar, Navbar)}
                               <View
                                 style={[
                                   style.videoView,
                                   {backgroundColor: '#ffffff00'},
                                 ]}>
-                                <NetworkQualityProvider>
-                                {layout === Layout.Pinned ? (
-                                  <PinnedVideo />
-                                ) : (
-                                  <GridVideo setLayout={setLayout} />
-                                )}
-                                {sidePanel === SidePanelType.Participants ? (
-                                  cmpTypeGuard(participantsPanel, ParticipantsView)
-                                ) : (
-                                  <></>
-                                )}
-                                </NetworkQualityProvider>
-                                {sidePanel === SidePanelType.Chat ? (
-                                  $config.CHAT ? (
-                                   cmpTypeGuard(chat,Chat)
+                                <POC_CustomUserContextHolder>
+                                  <NetworkQualityProvider>
+                                    <VideoArrayRenderer>
+                                      {(
+                                        minVideoArray: React.FC[],
+                                        maxVideoArray: React.FC[],
+                                      ) => {
+                                        const CurrentLayout =
+                                          fpeLayouts[layout].component;
+                                        return (
+                                          <CurrentLayout
+                                            minVideoArray={minVideoArray}
+                                            maxVideoArray={maxVideoArray}
+                                          />
+                                        );
+                                        // return layout === Layout.Pinned ? (
+                                        //   <PinnedVideo minVideoArray={minVideoArray} maxVideoArray={maxVideoArray}  />
+                                        // ) : (
+                                        //   <GridVideo minVideoArray={minVideoArray} maxVideoArray={maxVideoArray} setLayout={setLayout} />
+                                        // );
+                                      }}
+                                    </VideoArrayRenderer>
+                                    {sidePanel ===
+                                    SidePanelType.Participants ? (
+                                      cmpTypeGuard(
+                                        participantsPanel,
+                                        ParticipantsView,
+                                      )
+                                    ) : (
+                                      <></>
+                                    )}
+                                  </NetworkQualityProvider>
+                                  {sidePanel === SidePanelType.Chat ? (
+                                    $config.CHAT ? (
+                                      cmpTypeGuard(chat, Chat)
+                                    ) : (
+                                      <></>
+                                    )
                                   ) : (
                                     <></>
-                                  )
-                                ) : (
-                                  <></>
-                                )}
-                                {sidePanel === SidePanelType.Settings ? (
-                                  cmpTypeGuard(settingsPanel, SettingsView)
-                                ) : (
-                                  <></>
-                                )}
+                                  )}
+                                  {sidePanel === SidePanelType.Settings ? (
+                                    cmpTypeGuard(settingsPanel, SettingsView)
+                                  ) : (
+                                    <></>
+                                  )}
+                                </POC_CustomUserContextHolder>
                               </View>
-                            {Platform.OS !== 'web' &&
-                            sidePanel === SidePanelType.Chat ? (
-                              <></>
-                            ) : (
-                              cmpTypeGuard(bottomBar, Controls)
-                            )}
+                              {Platform.OS !== 'web' &&
+                              sidePanel === SidePanelType.Chat ? (
+                                <></>
+                              ) : (
+                                cmpTypeGuard(bottomBar, Controls)
+                              )}
                             </ChatUIDataProvider>
                           </VideoCallProvider>
                         )}
                       </NotificationControl>
                     </View>
                   ) : $config.PRECALL ? (
-                    <PreCallProvider                    
+                    <PreCallProvider
                       username={username}
                       setUsername={setUsername}
                       setCallActive={setCallActive}
                       queryComplete={queryComplete}
-                      title={title}
-                      >
-                       {cmpTypeGuard(PreCallScreenFpe,Precall)}
-                    </PreCallProvider>                    
+                      title={title}>
+                      {cmpTypeGuard(PreCallScreenFpe, Precall)}
+                    </PreCallProvider>
                   ) : (
                     <></>
                   )}

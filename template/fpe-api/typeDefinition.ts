@@ -10,12 +10,16 @@
 *********************************************
 */
 import React from 'react';
-import { channelMessage, chatInputInterface } from '../src/components/ChatContext';
+import {
+  channelMessage,
+  chatInputInterface,
+} from '../src/components/ChatContext';
+import {layoutObjectInterface} from '../src/pages/VideoCall';
 
 export const CUSTOM_ROUTES_PREFIX = '/r';
 
 //todo:hari define AnyReactComponent support any react component
-export type AnyReactComponent = React.FC<any>
+export type AnyReactComponent = React.FC<any>;
 
 export interface PreCallInterface {
   preview?: AnyReactComponent;
@@ -32,21 +36,37 @@ export interface ChatCmpInterface {
   chatInput?: React.FC<chatInputInterface>;
 }
 
+export interface renderComponentInterface {
+  user: any;
+  // ----------
+  // incase of single component for min and max
+  // with conditional rendering.
+  isMax?: Boolean;
+  // ----------
+  index: number;
+}
+
+export interface renderComponentObjectInterface {
+  [key: string]: React.FC<renderComponentInterface>;
+}
+
 export interface VideoCallInterface {
   topBar?: AnyReactComponent;
   settingsPanel?: AnyReactComponent;
   participantsPanel?: AnyReactComponent;
   bottomBar?: AnyReactComponent;
   chat?: ChatCmpInterface | AnyReactComponent;
+  renderComponentObject?: renderComponentObjectInterface;
+  customLayout?: (p: layoutObjectInterface[]) => layoutObjectInterface[];
 }
 
-export type ComponentsInterface ={
-  precall?: PreCallInterface | AnyReactComponent
+export type ComponentsInterface = {
+  precall?: PreCallInterface | AnyReactComponent;
   create?: AnyReactComponent;
   share?: AnyReactComponent;
   join?: AnyReactComponent;
   videoCall?: VideoCallInterface | AnyReactComponent;
-}
+};
 
 export interface CustomRoutesInterface {
   path: string;
@@ -56,7 +76,7 @@ export interface CustomRoutesInterface {
   privateRoute?: boolean;
   routeProps?: object;
   failureRedirectTo?: string;
-};
+}
 
 export interface FpeApiInterface {
   /**
@@ -72,7 +92,8 @@ export interface FpeApiInterface {
    */
   appRoot?: React.ReactNode;
   /**
-   * message callback used to listen for incoming message from private or public 
+   * message callback used to listen for incoming message from private or public
    */
   //message_callback?: //TODO:hari;
+  poc: any;
 }
