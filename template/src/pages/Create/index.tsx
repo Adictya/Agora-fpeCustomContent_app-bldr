@@ -9,29 +9,22 @@
  information visit https://appbuilder.agora.io. 
 *********************************************
 */
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, Dimensions, ScrollView, Platform} from 'react-native';
-import {useHistory} from '../components/Router';
-import Checkbox from '../subComponents/Checkbox';
+import React, {useContext, useEffect, useState} from 'react';
+import {View, Text, StyleSheet, ScrollView, Platform} from 'react-native';
+import {useHistory} from '../../components/Router';
+import Checkbox from '../../subComponents/Checkbox';
 import {gql, useMutation} from '@apollo/client';
-import Logo from '../subComponents/Logo';
-// import OpenInNativeButton from '../subComponents/OpenInNativeButton';
-import Share from '../components/Share';
-// import ColorContext from '../components/ColorContext';
-// import Illustration from '../subComponents/Illustration';
-// import {textInput} from '../../theme.json';
-import PrimaryButton from '../atoms/PrimaryButton';
-import SecondaryButton from '../atoms/SecondaryButton';
-import HorizontalRule from '../atoms/HorizontalRule';
-import TextInput from '../atoms/TextInput';
-import Error from '../subComponents/Error';
-import Toast from '../../react-native-toast-message';
-import hasBrandLogo from '../utils/hasBrandLogo';
-
-type PasswordInput = {
-  host: string;
-  view: string;
-};
+import PrimaryButton from '../../atoms/PrimaryButton';
+import SecondaryButton from '../../atoms/SecondaryButton';
+import HorizontalRule from '../../atoms/HorizontalRule';
+import TextInput from '../../atoms/TextInput';
+import Toast from '../../../react-native-toast-message';
+import { ErrorContext } from '../../components/common';
+import { ShareLinkProvider } from './ShareLink';
+import ShareLink from '../../components/Share'
+import Logo from '../../components/common/Logo'
+import { cmpTypeGuard } from '../../utils/common';
+import { useFpe } from 'fpe-api';
 
 const CREATE_CHANNEL = gql`
   mutation CreateChannel(
@@ -59,7 +52,8 @@ const CREATE_CHANNEL = gql`
 `;
 
 const Create = () => {
-  // const {primaryColor} = useContext(ColorContext);
+  const share =  useFpe(config => config.components?.share)
+  const {setGlobalErrorMessage} = useContext(ErrorContext)
   const history = useHistory();
   const [roomTitle, onChangeRoomTitle] = useState('');
   const [pstnCheckbox, setPstnCheckbox] = useState(false);
@@ -70,6 +64,10 @@ const Create = () => {
   const [roomCreated, setRoomCreated] = useState(false);
   const [joinPhrase, setJoinPhrase] = useState(null);
   const [createChannel, {data, loading, error}] = useMutation(CREATE_CHANNEL);
+
+  useEffect(() =>{
+    setGlobalErrorMessage(error);
+  },[error])
 
   console.log('mutation data', data);
 
@@ -107,28 +105,11 @@ const Create = () => {
     }
   };
 
-  const [dim, setDim] = useState([
-    Dimensions.get('window').width,
-    Dimensions.get('window').height,
-    Dimensions.get('window').width > Dimensions.get('window').height,
-  ]);
-  let onLayout = (e: any) => {
-    setDim([e.nativeEvent.layout.width, e.nativeEvent.layout.height]);
-  };
-
   return (
-    // <ImageBackground
-    //   style={style.full}
-    //   resizeMode={'cover'}>
-    // <KeyboardAvoidingView behavior={'height'} style={style.main}>
     <ScrollView contentContainerStyle={style.main}>      
-      <View style={style.nav}>
-        {hasBrandLogo && <Logo />}
-        {error ? <Error error={error} /> : <></>}
-        {/* <OpenInNativeButton /> */}
-      </View>
+      <Logo />
       {!roomCreated ? (
-        <View style={style.content} onLayout={onLayout}>
+        <View style={style.content}>
           <View style={style.leftContent}>
             <Text style={style.heading}>{$config.APP_NAME}</Text>
             <Text style={style.headline}>{$config.LANDING_SUB_HEADING}</Text>
@@ -180,14 +161,16 @@ const Create = () => {
           </View>
         </View>
       ) : (
-        <Share
+        <ShareLinkProvider
           urlView={urlView}
           urlHost={urlHost}
           pstn={pstn}
           hostControlCheckbox={hostControlCheckbox}
           joinPhrase={joinPhrase}
           roomTitle={roomTitle}
-        />
+        >
+          {cmpTypeGuard(share, ShareLink)}
+        </ShareLinkProvider>
       )}
     </ScrollView>
   );

@@ -30,8 +30,10 @@ import ColorContext from './ColorContext';
 import chatContext from './ChatContext';
 import {UserType} from './RTMConfigure';
 import TextWithTooltip from '../subComponents/TextWithTooltip';
+import { useChatUIData, useFpe } from 'fpe-api';
 
-const Chat = (props: any) => {
+const Chat = () => {
+  const ChatInputFpe = useFpe(data => typeof data.components?.videoCall === 'object' && typeof data.components?.videoCall?.chat === 'object' ? data.components?.videoCall?.chat?.chatInput : undefined)
   const {height, width} = useWindowDimensions();
   const [dim, setDim] = useState([
     Dimensions.get('window').width,
@@ -42,14 +44,13 @@ const Chat = (props: any) => {
 
   const {userList, localUid} = useContext(chatContext);
   const {
-    setChatDisplayed,
     pendingPrivateNotification,
     pendingPublicNotification,
     lastCheckedPrivateState,
     privateMessageCountMap,
     setPrivateMessageLastSeen,
     setPrivateChatDisplayed
-  } = props;
+  } = useChatUIData(data => data);
   const {primaryColor} = useContext(ColorContext);
   const [groupActive, setGroupActive] = useState(true);
   const [privateActive, setPrivateActive] = useState(false);
@@ -170,7 +171,7 @@ const Chat = (props: any) => {
                     marginBottom: 10,
                   }}
                 />
-                <ChatInput privateActive={privateActive} />
+                {ChatInputFpe ? <ChatInputFpe privateActive={privateActive} /> : <ChatInput privateActive={privateActive} />}          
               </View>
             </View>
           ) : (
@@ -186,7 +187,7 @@ const Chat = (props: any) => {
                   marginBottom: 10,
                 }}
               />
-              <ChatInput privateActive={privateActive} />
+              {ChatInputFpe ? <ChatInputFpe privateActive={privateActive} /> : <ChatInput privateActive={privateActive} />}               
             </View>
           )}
         </>
@@ -268,10 +269,12 @@ const Chat = (props: any) => {
                       marginBottom: 10,
                     }}
                   />
-                  <ChatInput
-                    privateActive={privateActive}
-                    selectedUser={selectedUser}
-                  />
+                  {ChatInputFpe ? <ChatInputFpe privateActive={privateActive} selectedUser={selectedUser} /> : 
+                    <ChatInput
+                      privateActive={privateActive}
+                      selectedUser={selectedUser}
+                    />
+                  }                  
                 </View>
               </View>
             </>

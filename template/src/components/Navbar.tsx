@@ -29,28 +29,23 @@ import {SidePanelType} from '../subComponents/SidePanelEnum';
 import {navHolder} from '../../theme.json';
 import Layout from '../subComponents/LayoutEnum';
 import ChatContext from '../components/ChatContext';
-import mobileAndTabletCheck from '../utils/mobileWebTest';
+import isMobileOrTablet from '../utils/mobileWebTest';
 import {BtnTemplate} from '../../agora-rn-uikit';
 import {ImageIcon} from '../../agora-rn-uikit';
+import { useVideoCall, useChatUIData } from 'fpe-api';
 
-const Navbar = (props: any) => {
-  const {primaryColor} = useContext(ColorContext);
+const Navbar = () => {
   const {messageStore} = useContext(ChatContext);
   const {
-    // participantsView,
-    // setParticipantsView,
     recordingActive,
     sidePanel,
     setSidePanel,
     layout,
     setLayout,
-    pendingMessageLength,
-    setLastCheckedPublicState,
-    // setChatDisplayed,
-    // chatDisplayed,
     isHost,
     title,
-  } = props;
+  } = useVideoCall(data => data);
+  const {pendingMessageLength, setLastCheckedPublicState} = useChatUIData(data => data);
   const [dim, setDim] = useState([
     Dimensions.get('window').width,
     Dimensions.get('window').height,
@@ -68,13 +63,13 @@ const Navbar = (props: any) => {
         {backgroundColor: $config.SECONDARY_FONT_COLOR + 80},
         Platform.OS === 'web'
           ? {
-              justifyContent: mobileAndTabletCheck()
+              justifyContent: isMobileOrTablet()
                 ? 'space-between'
                 : 'flex-end',
             }
           : {},
       ]}>
-      {recordingActive && !mobileAndTabletCheck() ? (
+      {recordingActive && !isMobileOrTablet() ? (
         <View
           style={[
             style.recordingView,
@@ -107,7 +102,7 @@ const Navbar = (props: any) => {
       <View
         style={[
           style.roomNameContainer,
-          Platform.OS === 'web' && !mobileAndTabletCheck()
+          Platform.OS === 'web' && !isMobileOrTablet()
             ? {transform: [{translateX: '50%'}]}
             : {},
         ]}>
@@ -119,7 +114,7 @@ const Navbar = (props: any) => {
               paddingLeft: 5,
             }}>
             <Text style={style.roomNameText}>
-              {mobileAndTabletCheck()
+              {isMobileOrTablet()
                 ? title.length > 13
                   ? title.slice(0, 13) + '..'
                   : title
@@ -160,7 +155,7 @@ const Navbar = (props: any) => {
                 ? $config.SECONDARY_FONT_COLOR
                 : $config.SECONDARY_FONT_COLOR + '00',
             paddingVertical: 4,
-            paddingHorizontal: mobileAndTabletCheck() ? 0 : 4,
+            paddingHorizontal: isMobileOrTablet() ? 0 : 4,
             minHeight: 35,
             // height: 40,
             // backgroundColor: '#f0f',
@@ -169,7 +164,7 @@ const Navbar = (props: any) => {
             minWidth:
               Platform.OS === 'web' && isDesktop
                 ? 300
-                : mobileAndTabletCheck()
+                : isMobileOrTablet()
                 ? 160
                 : 200,
             // borderTopLeftRadius: 10,
@@ -335,7 +330,7 @@ const style = StyleSheet.create({
     resizeMode: 'contain',
   },
   btnHolder: {   
-    marginHorizontal: mobileAndTabletCheck() ? 2 : 0, 
+    marginHorizontal: isMobileOrTablet() ? 2 : 0, 
     width: '100%',
     height: '100%',
     resizeMode: 'contain',

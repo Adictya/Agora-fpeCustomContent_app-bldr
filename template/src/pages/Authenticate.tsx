@@ -9,27 +9,26 @@
  information visit https://appbuilder.agora.io. 
 *********************************************
 */
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {
   View,
   Text,
   ImageBackground,
   StyleSheet,
-  Dimensions,
+  LayoutChangeEvent,
 } from 'react-native';
 import Logo from '../subComponents/Logo';
 import OAuth from '../components/OAuth';
 import Illustration from '../subComponents/Illustration';
-import hasBrandLogo from '../utils/hasBrandLogo';
+import {hasBrandLogo} from '../utils/common';
+import DimensionContext from '../components/dimension/DimensionContext';
 
 const Authenticate = () => {
-  const [dim, setDim] = useState([
-    Dimensions.get('window').width,
-    Dimensions.get('window').height,
-    Dimensions.get('window').width > Dimensions.get('window').height,
-  ]);
-  let onLayout = (e: any) => {
-    setDim([e.nativeEvent.layout.width, e.nativeEvent.layout.height]);
+  const {getDimensionData}= useContext(DimensionContext)
+  const [isDesktop, setIsDesktop] = useState(false)
+  let onLayout = (e: LayoutChangeEvent) => {
+    const {isDesktop}  = getDimensionData(e.nativeEvent.layout.width, e.nativeEvent.layout.height)
+    setIsDesktop(isDesktop)
   };
   return (
     <ImageBackground
@@ -47,7 +46,7 @@ const Authenticate = () => {
             </Text>
             <OAuth />
           </View>
-          {dim[0] > dim[1] + 150 ? (
+          {isDesktop ? (
             <View style={style.full}>
               <Illustration />
             </View>
